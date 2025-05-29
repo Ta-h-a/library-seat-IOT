@@ -46,147 +46,168 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            children: [
-              const Spacer(flex: 2),
-              // Logo section
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Icon(
-                  Icons.restaurant,
-                  size: 40,
-                  color: Colors.blue.shade400,
-                ),
-              ),
-              const SizedBox(height: 32),
-              // App name
-              const Text(
-                'DineFlow',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 40),
-              // Welcome text
-              const Text(
-                'Welcome',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 8),
-              // Subtitle
-              Text(
-                'Choose your role to continue',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey.shade600,
-                ),
-              ),
-              const Spacer(flex: 1),
-              // Staff Login Button
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            TableOverviewPage(userRole: 'staff'),
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue.shade400,
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.person_outline, size: 20),
-                      SizedBox(width: 8),
-                      Text(
-                        'Staff Login',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
+      body: Stack(
+        children: [
+          // Watermark background
+          Positioned.fill(
+            child: Opacity(
+              opacity: 0.08,
+              child: Center(
+                child: SizedBox(
+                  width: 250, // Adjust the width as needed
+                  height: 250, // Adjust the height as needed
+                  child: Image.asset(
+                    'assets/rv_logo.png',
+                    fit: BoxFit.contain,
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
-              // Customer Login Button
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            TableOverviewPage(userRole: 'customer'),
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green.shade400,
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.restaurant_menu, size: 20),
-                      SizedBox(width: 8),
-                      Text(
-                        'Customer Login',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const Spacer(flex: 1),
-              // Bottom indicator (home indicator style)
-              Container(
-                width: 134,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(2.5),
-                ),
-              ),
-              const SizedBox(height: 20),
-            ],
+            ),
           ),
-        ),
+          // Main content
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Column(
+                children: [
+                  const Spacer(flex: 2),
+                  // Logo section
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade50,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Icon(
+                      Icons.restaurant,
+                      size: 40,
+                      color: Colors.blue.shade400,
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  // App name
+                  const Text(
+                    'DineFlow',
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                  // Welcome text
+                  const Text(
+                    'Welcome',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  // Subtitle
+                  Text(
+                    'Choose your role to continue',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                  const Spacer(flex: 1),
+                  // Staff Login Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                TableOverviewPage(userRole: 'staff'),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue.shade400,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.person_outline, size: 20),
+                          SizedBox(width: 8),
+                          Text(
+                            'Staff Login',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Customer Login Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                TableOverviewPage(userRole: 'customer'),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green.shade400,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.restaurant_menu, size: 20),
+                          SizedBox(width: 8),
+                          Text(
+                            'Customer Login',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const Spacer(flex: 1),
+                  // Bottom indicator (home indicator style)
+                  Container(
+                    width: 134,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(2.5),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
