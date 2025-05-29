@@ -855,7 +855,7 @@ class _SensorDataWidgetState extends State<SensorDataWidget> {
               String rawData = String.fromCharCodes(event).trim();
               try {
                 _distance = double.tryParse(rawData) ?? 0.0;
-                _data = 'Distance: ${_distance.toStringAsFixed(1)} cm';
+                _data = 'Distance: ${_distance.toStringAsFixed(1)} inch';
                 // Notify parent about distance update
                 widget.onDistanceUpdate(_distance);
               } catch (e) {
