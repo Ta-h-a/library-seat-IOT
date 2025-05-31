@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:flutter_libserialport/flutter_libserialport.dart';
 
+
 void main() {
   runApp(const MyApp());
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -32,15 +34,19 @@ class MyApp extends StatelessWidget {
   }
 }
 
+
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
+
 
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
 
+
 class _LoginPageState extends State<LoginPage> {
   String _userRole = 'staff'; // Default to staff for demo purposes
+
 
   @override
   Widget build(BuildContext context) {
@@ -213,18 +219,22 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
+
 class TableOverviewPage extends StatefulWidget {
   final String userRole;
   const TableOverviewPage({super.key, required this.userRole});
+
 
   @override
   State<TableOverviewPage> createState() => _TableOverviewPageState();
 }
 
+
 class _TableOverviewPageState extends State<TableOverviewPage> {
   String _selectedFilter = 'All Tables';
   bool _isTableOneOccupied = false;
   bool _wasTableOneOccupied = false;
+
 
   void updateTableOneStatus(double distance) {
     setState(() {
@@ -241,6 +251,7 @@ class _TableOverviewPageState extends State<TableOverviewPage> {
       // That will only happen when the table is tapped
     });
   }
+
 
   List<TableData> get _allTables => [
         TableData(
@@ -270,12 +281,14 @@ class _TableOverviewPageState extends State<TableOverviewPage> {
         TableData('T8', Colors.blue.shade400, Icons.lock_outline, 'Reserved'),
       ];
 
+
   List<TableData> get _filteredTables {
     if (_selectedFilter == 'All Tables') return _allTables;
     return _allTables
         .where((table) => table.status == _selectedFilter)
         .toList();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -293,6 +306,7 @@ class _TableOverviewPageState extends State<TableOverviewPage> {
         );
       }
 
+
       // For other tables, use the regular TableCard
       bool isRectangular = false;
       switch (table.name) {
@@ -306,6 +320,7 @@ class _TableOverviewPageState extends State<TableOverviewPage> {
           isRectangular = false;
       }
 
+
       return TableCard(
         key: ValueKey(table.name),
         label: table.name,
@@ -316,6 +331,7 @@ class _TableOverviewPageState extends State<TableOverviewPage> {
         userRole: widget.userRole,
       );
     }).toList();
+
 
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
@@ -412,6 +428,7 @@ class _TableOverviewPageState extends State<TableOverviewPage> {
   }
 }
 
+
 class TableCard extends StatefulWidget {
   final String label;
   final Color color;
@@ -419,6 +436,7 @@ class TableCard extends StatefulWidget {
   final String status;
   final bool isRectangular;
   final String userRole;
+
 
   const TableCard({
     super.key,
@@ -430,14 +448,17 @@ class TableCard extends StatefulWidget {
     required this.userRole,
   });
 
+
   @override
   State<TableCard> createState() => _TableCardState();
 }
+
 
 class _TableCardState extends State<TableCard> {
   late String _status;
   late Color _color;
   late IconData _icon;
+
 
   @override
   void initState() {
@@ -446,6 +467,7 @@ class _TableCardState extends State<TableCard> {
     _color = widget.color;
     _icon = widget.icon;
   }
+
 
   void _toggleStatus() {
     setState(() {
@@ -460,6 +482,7 @@ class _TableCardState extends State<TableCard> {
       }
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -509,6 +532,7 @@ class _TableCardState extends State<TableCard> {
     );
   }
 
+
   Widget buildRoundTable(Color color) {
     return SizedBox(
       width: 80,
@@ -543,6 +567,7 @@ class _TableCardState extends State<TableCard> {
       ),
     );
   }
+
 
   Widget buildRectangularTable(Color color) {
     return SizedBox(
@@ -581,6 +606,7 @@ class _TableCardState extends State<TableCard> {
     );
   }
 
+
   Widget seatDot(Color color) {
     return Container(
       width: 16,
@@ -600,6 +626,7 @@ class _TableCardState extends State<TableCard> {
   }
 }
 
+
 class TableOneCard extends StatefulWidget {
   final String label;
   final Color color;
@@ -608,6 +635,7 @@ class TableOneCard extends StatefulWidget {
   final String userRole;
   final bool isOccupied;
   final bool wasOccupied;
+
 
   const TableOneCard({
     super.key,
@@ -620,20 +648,24 @@ class TableOneCard extends StatefulWidget {
     required this.wasOccupied,
   });
 
+
   @override
   State<TableOneCard> createState() => _TableOneCardState();
 }
+
 
 class _TableOneCardState extends State<TableOneCard> {
   late String _status;
   late Color _color;
   late IconData _icon;
 
+
   @override
   void initState() {
     super.initState();
     _updateStatus();
   }
+
 
   @override
   void didUpdateWidget(TableOneCard oldWidget) {
@@ -643,6 +675,7 @@ class _TableOneCardState extends State<TableOneCard> {
       _updateStatus();
     }
   }
+
 
   void _updateStatus() {
     setState(() {
@@ -662,6 +695,7 @@ class _TableOneCardState extends State<TableOneCard> {
     });
   }
 
+
   void _toggleStatus() {
     setState(() {
       if (_status == 'Available') {
@@ -679,6 +713,7 @@ class _TableOneCardState extends State<TableOneCard> {
       }
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -726,6 +761,7 @@ class _TableOneCardState extends State<TableOneCard> {
     );
   }
 
+
   Widget buildRectangularTable(Color color) {
     return SizedBox(
       width: 80,
@@ -763,6 +799,7 @@ class _TableOneCardState extends State<TableOneCard> {
     );
   }
 
+
   Widget seatDot(Color color) {
     return Container(
       width: 16,
@@ -782,14 +819,17 @@ class _TableOneCardState extends State<TableOneCard> {
   }
 }
 
+
 class TableData {
   final String name;
   final Color color;
   final IconData icon;
   final String status;
 
+
   TableData(this.name, this.color, this.icon, this.status);
 }
+
 
 class FilterChips extends StatelessWidget {
   final String selectedFilter;
@@ -798,6 +838,7 @@ class FilterChips extends StatelessWidget {
       {super.key,
       required this.selectedFilter,
       required this.onFilterSelected});
+
 
   @override
   Widget build(BuildContext context) {
@@ -822,6 +863,7 @@ class FilterChips extends StatelessWidget {
     );
   }
 
+
   Widget buildChip(String label, {bool isSelected = false}) {
     return ChoiceChip(
       label: Text(
@@ -842,17 +884,21 @@ class FilterChips extends StatelessWidget {
   }
 }
 
+
 class SensorDataWidget extends StatefulWidget {
   final Function(double) onDistanceUpdate;
+
 
   const SensorDataWidget({
     super.key,
     required this.onDistanceUpdate,
   });
 
+
   @override
   State<SensorDataWidget> createState() => _SensorDataWidgetState();
 }
+
 
 class _SensorDataWidgetState extends State<SensorDataWidget> {
   final _port = SerialPort('COM5');
@@ -860,11 +906,13 @@ class _SensorDataWidgetState extends State<SensorDataWidget> {
   String _data = '';
   double _distance = 0.0;
 
+
   @override
   void initState() {
     super.initState();
     _initializeSerialPort();
   }
+
 
   void _initializeSerialPort() {
     try {
@@ -898,12 +946,14 @@ class _SensorDataWidgetState extends State<SensorDataWidget> {
     }
   }
 
+
   @override
   void dispose() {
     _reader?.close();
     _port.close();
     super.dispose();
   }
+
 
   @override
   Widget build(BuildContext context) {

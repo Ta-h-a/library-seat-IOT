@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "1065480673190",
+    "firebase_url": "https://hotel-occup-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "hotel-occup",
+    "storage_bucket": "hotel-occup.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1065480673190:android:022eeee8a198f491976167",
+        "android_client_info": {
+          "package_name": "com.example.hotel_occup"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDcE9oY9LLcIVz4WspJ7sD-BT3GClVggAU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -32,6 +32,8 @@ dependencies:
     sdk: flutter
   http: ^0.13.6
   flutter_libserialport: ^0.3.0
+  firebase_core: ^2.10.0
+  firebase_database: ^10.0.9
 
 
 
