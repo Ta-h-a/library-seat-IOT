@@ -188,7 +188,7 @@ class _LoginPageState extends State<LoginPage> {
                           Icon(Icons.restaurant_menu, size: 20),
                           SizedBox(width: 8),
                           Text(
-                            'Customer Login',
+                            'View Table Status',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
