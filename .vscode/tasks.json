@@ -1,0 +1,13 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "shell",
+      "label": "Flutter Build (Release)",
+      "command": "flutter build apk --release",
+      "group": "build",
+      "problemMatcher": ["$dart-flutter"],
+      "args": []
+    }
+  ]
+}
