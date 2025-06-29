@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:hotel_occup/services/serial_service_locator.dart';
 import 'package:hotel_occup/services/serial_service.dart';
+import 'package:hotel_occup/services/reservation_service.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => getReservationService(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -45,7 +52,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: Color(0xFFEDE3D6),
       body: Stack(
         children: [
           // Watermark background
@@ -76,19 +83,19 @@ class _LoginPageState extends State<LoginPage> {
                     width: 80,
                     height: 80,
                     decoration: BoxDecoration(
-                      color: Colors.blue.shade50,
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Icon(
-                      Icons.restaurant,
+                      Icons.book,
                       size: 40,
-                      color: Colors.blue.shade400,
+                      color: Color(0xFF48252F),
                     ),
                   ),
                   const SizedBox(height: 32),
                   // App name
                   const Text(
-                    'DineFlow',
+                    'LibFlow',
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.w600,
@@ -130,7 +137,7 @@ class _LoginPageState extends State<LoginPage> {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue.shade400,
+                        backgroundColor: Color(0xFF29281E),
                         foregroundColor: Colors.white,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
@@ -143,10 +150,11 @@ class _LoginPageState extends State<LoginPage> {
                           Icon(Icons.person_outline, size: 20),
                           SizedBox(width: 8),
                           Text(
-                            'Staff Login',
+                            'Librarian View',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
+                              color: Colors.white,
                             ),
                           ),
                         ],
@@ -169,7 +177,7 @@ class _LoginPageState extends State<LoginPage> {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green.shade400,
+                        backgroundColor: Color(0xFF292819),
                         foregroundColor: Colors.white,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
@@ -179,7 +187,7 @@ class _LoginPageState extends State<LoginPage> {
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.restaurant_menu, size: 20),
+                          Icon(Icons.table_bar, size: 20),
                           SizedBox(width: 8),
                           Text(
                             'View Table Status',
@@ -226,6 +234,7 @@ class _TableOverviewPageState extends State<TableOverviewPage> {
   bool _isTableOneOccupied = false;
   bool _wasTableOneOccupied = false;
   late final SerialService _serialService;
+  late final ReservationService _reservationService;
 
   @override
   void initState() {
@@ -235,12 +244,20 @@ class _TableOverviewPageState extends State<TableOverviewPage> {
     _serialService.distanceStream.listen((distance) {
       updateTableOneStatus(distance);
     });
+    _reservationService = getReservationService();
+    _reservationService.addListener(_onReservationServiceChange);
   }
 
   @override
   void dispose() {
     _serialService.dispose();
+    _reservationService.removeListener(_onReservationServiceChange);
     super.dispose();
+  }
+
+  void _onReservationServiceChange() {
+    // Rebuild the UI when reservation service data changes
+    setState(() {});
   }
 
   void updateTableOneStatus(double distance) {
@@ -251,14 +268,12 @@ class _TableOverviewPageState extends State<TableOverviewPage> {
       if (distance < 20.0) {
         // When object is detected (distance < 20cm)
         _isTableOneOccupied = true;
-        _wasTableOneOccupied = false;
-      } else if (_isTableOneOccupied) {
-        // When object moves away (distance >= 20cm) and table was occupied
+        _wasTableOneOccupied = false; // Ensure this is false when occupied
+      } else {
+        // When object moves away (distance >= 20cm)
         _isTableOneOccupied = false;
-        _wasTableOneOccupied = true;
+        _wasTableOneOccupied = false; // Directly transition to available
       }
-      // Note: We don't automatically change from Needs Cleaning to Available
-      // That will only happen when the table is tapped
     });
   }
 
@@ -266,10 +281,10 @@ class _TableOverviewPageState extends State<TableOverviewPage> {
         TableData(
             'T1',
             _isTableOneOccupied
-                ? Colors.red.shade400
+                ? Color(0xFFEF5350)
                 : (_wasTableOneOccupied
-                    ? Colors.orange.shade400
-                    : Colors.green.shade400),
+                    ? Color(0xFFFF9800)
+                    : Color(0xFF296F2F)),
             _isTableOneOccupied
                 ? Icons.person_outline
                 : (_wasTableOneOccupied
@@ -278,17 +293,29 @@ class _TableOverviewPageState extends State<TableOverviewPage> {
             _isTableOneOccupied
                 ? 'Occupied'
                 : (_wasTableOneOccupied ? 'Needs Cleaning' : 'Available')),
-        TableData('T2', Colors.red.shade400, Icons.person_outline, 'Occupied'),
-        TableData('T3', Colors.blue.shade400, Icons.lock_outline, 'Reserved'),
-        TableData('T4', Colors.orange.shade400,
-            Icons.cleaning_services_outlined, 'Needs Cleaning'),
-        TableData('T5', Colors.green.shade400, Icons.check_circle_outlined,
-            'Available'),
-        TableData('T6', Colors.red.shade400, Icons.person_outline, 'Occupied'),
-        TableData('T7', Colors.orange.shade400,
-            Icons.cleaning_services_outlined, 'Needs Cleaning'),
-        TableData('T8', Colors.blue.shade400, Icons.lock_outline, 'Reserved'),
-      ];
+        TableData('T2', Color(0xFF891D1A), Icons.person_outline, 'Occupied'),
+        TableData('T3', Color.fromARGB(255, 2, 70, 118), Icons.lock_outline,
+            'Reserved'),
+        TableData('T4', Color.fromARGB(255, 2, 70, 118), Icons.lock_outline,
+            'Reserved'),
+        // TableData('T4', Colors.orange.shade400,
+        //     Icons.cleaning_services_outlined, 'Needs Cleaning'),
+        TableData(
+            'T5', Color(0xFF296F2F), Icons.check_circle_outlined, 'Available'),
+        TableData('T6', Color(0xFF891D1A), Icons.person_outline, 'Occupied'),
+        // TableData('T7', Colors.orange.shade400,
+        //     Icons.cleaning_services_outlined, 'Needs Cleaning'),
+        TableData('T7', Color.fromARGB(255, 2, 70, 118), Icons.lock_outline,
+            'Reserved'),
+        TableData(
+            'T8', Color(0xFF296F2F), Icons.check_circle_outlined, 'Available'),
+      ].map((table) {
+        if (_reservationService.isTableReserved(table.name)) {
+          return TableData(table.name, Color.fromARGB(255, 2, 70, 118),
+              Icons.lock_outline, 'Reserved');
+        }
+        return table;
+      }).toList();
 
   List<TableData> get _filteredTables {
     if (_selectedFilter == 'All Tables') return _allTables;
@@ -338,33 +365,35 @@ class _TableOverviewPageState extends State<TableOverviewPage> {
     }).toList();
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: Color(0xFF110703),
       appBar: AppBar(
+        backgroundColor: Color(0xFF110703),
         title: Padding(
           padding: const EdgeInsets.only(left: 16.0, top: 8),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text("Table Overview"),
+              Text("Library Overview",
+                  style: TextStyle(color: Color(0xFFA7795E))),
               const SizedBox(height: 4),
               Text(
                 "8 Tables • 2 Occupied • 2 Reserved",
-                style: TextStyle(color: Colors.grey, fontSize: 14),
+                style: TextStyle(color: Color(0xFF6E3C19), fontSize: 14),
               ),
               Text(
                 "Logged in as: ${widget.userRole.toUpperCase()}",
-                style: TextStyle(color: Colors.blue, fontSize: 12),
+                style: TextStyle(color: Color(0xFF6E3C19), fontSize: 12),
               ),
             ],
           ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.search),
+            icon: const Icon(Icons.search, color: Color(0xFFA7795E)),
             onPressed: () {},
           ),
           IconButton(
-            icon: const Icon(Icons.logout),
+            icon: const Icon(Icons.logout, color: Color(0xFFA7795E)),
             onPressed: () {
               Navigator.pushReplacement(
                 context,
@@ -385,6 +414,118 @@ class _TableOverviewPageState extends State<TableOverviewPage> {
               });
             },
           ),
+          // Reservation Requests Section (Staff View)
+          if (widget.userRole == 'staff')
+            Consumer<ReservationService>(
+              builder: (context, reservationService, child) {
+                if (reservationService.pendingRequests.isEmpty) {
+                  return const SizedBox.shrink(); // Hide if no pending requests
+                }
+                return Container(
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Color(0xFF230F08), // Medium brown
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        spreadRadius: 2,
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Reservation Requests',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFFA7795E), // Light accent
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        height:
+                            200.0, // Fixed height to prevent unbounded errors
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: reservationService.pendingRequests.length,
+                          itemBuilder: (context, index) {
+                            final request =
+                                reservationService.pendingRequests[index];
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 8.0),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Table ${request.tableId} by ${request.customerName}',
+                                          style: TextStyle(
+                                              color: Color(0xFFA7795E),
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                        Text(
+                                          'Requested at: ${request.requestTime.toLocal().toString().split('.')[0]}',
+                                          style: TextStyle(
+                                              color: Color(0xFF6E3C19),
+                                              fontSize: 12),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.check_circle,
+                                            color: Color(0xFF296F2F)),
+                                        onPressed: () {
+                                          reservationService
+                                              .approveReservation(request);
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                                content: Text(
+                                                    'Approved reservation for ${request.tableId}')),
+                                          );
+                                        },
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.cancel,
+                                            color: Color(0xFF891D1A)),
+                                        onPressed: () {
+                                          reservationService
+                                              .rejectReservation(request);
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                                content: Text(
+                                                    'Rejected reservation for ${request.tableId}')),
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           const SizedBox(height: 8),
           Expanded(
             child: Padding(
@@ -408,8 +549,9 @@ class _TableOverviewPageState extends State<TableOverviewPage> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         elevation: 8,
-        selectedItemColor: Colors.blue.shade400,
-        unselectedItemColor: Colors.grey.shade600,
+        backgroundColor: Color(0xFF110703),
+        selectedItemColor: Color(0xFF6E3C19),
+        unselectedItemColor: Color(0xFF34170D),
         showUnselectedLabels: true,
         items: const [
           BottomNavigationBarItem(
@@ -420,14 +562,34 @@ class _TableOverviewPageState extends State<TableOverviewPage> {
               icon: Icon(Icons.settings_outlined), label: "Settings"),
         ],
       ),
-      floatingActionButton: widget.userRole == 'staff'
-          ? FloatingActionButton(
-              onPressed: () {},
-              backgroundColor: Colors.blue.shade400,
+      floatingActionButton: widget.userRole == 'customer'
+          ? FloatingActionButton.extended(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ReserveTablePage(
+                      reservationService: _reservationService,
+                      allTables:
+                          _allTables, // Pass all tables to the reservation page
+                    ),
+                  ),
+                );
+              },
+              backgroundColor: Color(0xFF6E3C19),
               elevation: 4,
-              child: const Icon(Icons.add, color: Colors.white),
+              icon: const Icon(Icons.add, color: Color(0xFFA7795E)),
+              label: const Text('Reserve a Table',
+                  style: TextStyle(color: Color(0xFFA7795E))),
             )
-          : null,
+          : widget.userRole == 'staff'
+              ? FloatingActionButton(
+                  onPressed: () {},
+                  backgroundColor: Color(0xFF6E3C19),
+                  elevation: 4,
+                  child: const Icon(Icons.add, color: Color(0xFFA7795E)),
+                )
+              : null,
     );
   }
 }
@@ -471,11 +633,11 @@ class _TableCardState extends State<TableCard> {
     setState(() {
       if (_status == 'Reserved' || _status == 'Needs Cleaning') {
         _status = 'Available';
-        _color = Colors.green.shade400;
+        _color = Color(0xFF296F2F);
         _icon = Icons.check_circle_outlined;
       } else if (_status == 'Available') {
         _status = 'Reserved';
-        _color = Colors.blue.shade400;
+        _color = Color.fromARGB(255, 2, 70, 118);
         _icon = Icons.lock_outline;
       }
     });
@@ -489,6 +651,7 @@ class _TableCardState extends State<TableCard> {
           : null,
       child: Card(
         elevation: 2,
+        color: Color(0xFFE6D6C8),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
@@ -668,15 +831,11 @@ class _TableOneCardState extends State<TableOneCard> {
     setState(() {
       if (widget.isOccupied) {
         _status = 'Occupied';
-        _color = Colors.red.shade400;
+        _color = Color(0xFFEF5350);
         _icon = Icons.person_outline;
-      } else if (widget.wasOccupied) {
-        _status = 'Needs Cleaning';
-        _color = Colors.orange.shade400;
-        _icon = Icons.cleaning_services_outlined;
       } else {
         _status = 'Available';
-        _color = Colors.green.shade400;
+        _color = Color(0xFF296F2F);
         _icon = Icons.check_circle_outlined;
       }
     });
@@ -686,15 +845,15 @@ class _TableOneCardState extends State<TableOneCard> {
     setState(() {
       if (_status == 'Available') {
         _status = 'Reserved';
-        _color = Colors.blue.shade400;
+        _color = Color.fromARGB(255, 2, 70, 118);
         _icon = Icons.lock_outline;
       } else if (_status == 'Reserved') {
         _status = 'Available';
-        _color = Colors.green.shade400;
+        _color = Color(0xFF296F2F);
         _icon = Icons.check_circle_outlined;
       } else if (_status == 'Needs Cleaning') {
         _status = 'Available';
-        _color = Colors.green.shade400;
+        _color = Color(0xFF296F2F);
         _icon = Icons.check_circle_outlined;
       }
     });
@@ -708,6 +867,7 @@ class _TableOneCardState extends State<TableOneCard> {
           : null,
       child: Card(
         elevation: 2,
+        color: Color(0xFFE6D6C8),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
@@ -847,13 +1007,13 @@ class FilterChips extends StatelessWidget {
       label: Text(
         label,
         style: TextStyle(
-          color: isSelected ? Colors.white : Colors.black,
+          color: isSelected ? Colors.black : Color(0xFF6E3C19),
           fontSize: 14,
         ),
       ),
       selected: isSelected,
-      selectedColor: Colors.blue.shade400,
-      backgroundColor: Colors.grey.shade200,
+      selectedColor: Color(0xFFA7795E),
+      backgroundColor: Color(0xFF230F08),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),
@@ -899,11 +1059,11 @@ class _SensorDataWidgetState extends State<SensorDataWidget> {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Color(0xFF230F08),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.blue.withOpacity(0.1),
+            color: Colors.black.withOpacity(0.3),
             spreadRadius: 2,
             blurRadius: 8,
             offset: const Offset(0, 2),
@@ -921,12 +1081,12 @@ class _SensorDataWidgetState extends State<SensorDataWidget> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.blue.shade50,
+                      color: Color(0xFF110703),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
                       Icons.sensors,
-                      color: Colors.blue.shade400,
+                      color: Color(0xFF6E3C19),
                       size: 28,
                     ),
                   ),
@@ -936,7 +1096,7 @@ class _SensorDataWidgetState extends State<SensorDataWidget> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                      color: Color(0xFFA7795E),
                     ),
                   ),
                 ],
@@ -945,13 +1105,13 @@ class _SensorDataWidgetState extends State<SensorDataWidget> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.green.shade50,
+                  color: Color(0xFF296F2F),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: Text(
+                child: const Text(
                   'Live',
                   style: TextStyle(
-                    color: Colors.green.shade700,
+                    color: Colors.white,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
@@ -966,12 +1126,129 @@ class _SensorDataWidgetState extends State<SensorDataWidget> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.blue.shade700,
+                color: Color(0xFFA7795E),
               ),
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class ReserveTablePage extends StatelessWidget {
+  final ReservationService reservationService;
+  final List<TableData> allTables;
+
+  const ReserveTablePage({
+    super.key,
+    required this.reservationService,
+    required this.allTables,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final availableTables = allTables.where((table) {
+      return table.status == 'Available' &&
+          !reservationService.hasPendingRequest(table.name) &&
+          !reservationService.isTableReserved(table.name);
+    }).toList();
+
+    return Scaffold(
+      backgroundColor: Color(0xFF110703),
+      appBar: AppBar(
+        backgroundColor: Color(0xFF110703),
+        title: const Text(
+          'Reserve a Table',
+          style: TextStyle(color: Color(0xFFA7795E)),
+        ),
+        iconTheme: const IconThemeData(color: Color(0xFFA7795E)),
+      ),
+      body: availableTables.isEmpty
+          ? Center(
+              child: Text(
+                'No available tables for reservation.',
+                style: TextStyle(color: Color(0xFFA7795E), fontSize: 16),
+              ),
+            )
+          : GridView.builder(
+              padding: const EdgeInsets.all(16.0),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 0.9,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+              ),
+              itemCount: availableTables.length,
+              itemBuilder: (context, index) {
+                final table = availableTables[index];
+                return GestureDetector(
+                  onTap: () {
+                    _showReservationDialog(context, table);
+                  },
+                  child: TableCard(
+                    label: table.name,
+                    color: table.color,
+                    icon: table.icon,
+                    status: table.status,
+                    userRole: 'customer', // Assuming customer context
+                  ),
+                );
+              },
+            ),
+    );
+  }
+
+  void _showReservationDialog(BuildContext context, TableData table) {
+    final TextEditingController nameController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Color(0xFF230F08),
+          title: Text('Reserve ${table.name}',
+              style: TextStyle(color: Color(0xFFA7795E))),
+          content: TextField(
+            controller: nameController,
+            decoration: InputDecoration(
+              hintText: 'Your Name',
+              hintStyle: TextStyle(color: Color(0xFFA7795E).withOpacity(0.7)),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Color(0xFF34170D)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Color(0xFF6E3C19)),
+              ),
+            ),
+            style: TextStyle(color: Color(0xFFA7795E)),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('Cancel', style: TextStyle(color: Color(0xFFA7795E))),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (nameController.text.isNotEmpty) {
+                  reservationService.addReservationRequest(
+                      table.name, nameController.text);
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        content: Text(
+                            'Reservation request for ${table.name} sent!')),
+                  );
+                }
+              },
+              style:
+                  ElevatedButton.styleFrom(backgroundColor: Color(0xFF6E3C19)),
+              child: Text('Reserve', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
     );
   }
 }
