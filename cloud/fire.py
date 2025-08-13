@@ -7,9 +7,9 @@ import json
 import time
 
 # CONFIGURATION
-SERIAL_PORT = 'COM5'  # Replace with your ESP32 port
+SERIAL_PORT = 'COM3'  # Replace with your ESP32 port
 BAUD_RATE = 115200
-FIREBASE_URL = 'https://hotel-occup-default-rtdb.asia-southeast1.firebasedatabase.app/distance.json'
+FIREBASE_URL = 'https://hotel-occupancy-cloud-default-rtdb.asia-southeast1.firebasedatabase.app/distance.json'
 # Replace with your DB URL
 
 def send_to_firebase(distance_cm):
